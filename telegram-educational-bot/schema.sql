@@ -47,6 +47,34 @@ CREATE TABLE IF NOT EXISTS lectures (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+ALTER TABLE lectures ALTER COLUMN lecture_number DROP NOT NULL;
+ALTER TABLE lectures ALTER COLUMN telegram_file_id DROP NOT NULL;
+ALTER TABLE lectures ADD COLUMN IF NOT EXISTS doctor_name TEXT;
+ALTER TABLE lectures ADD COLUMN IF NOT EXISTS file_type TEXT NOT NULL DEFAULT 'document';
+ALTER TABLE lectures ADD COLUMN IF NOT EXISTS content_text TEXT;
+
+CREATE TABLE IF NOT EXISTS bot_sessions (
+  telegram_id BIGINT PRIMARY KEY,
+  state TEXT NOT NULL DEFAULT 'IDLE',
+  payload JSONB NOT NULL DEFAULT '{}'::JSONB,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS announcements (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title TEXT NOT NULL,
+  content TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS schedule_events (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title TEXT NOT NULL,
+  starts_at TIMESTAMPTZ NOT NULL,
+  created_by BIGINT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
 CREATE INDEX IF NOT EXISTS idx_students_department_id
   ON students (department_id);
 

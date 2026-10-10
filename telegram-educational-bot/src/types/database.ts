@@ -25,8 +25,11 @@ export interface Lecture {
   id: string;
   course_id: string;
   title: string;
-  lecture_number: number;
-  telegram_file_id: string;
+  lecture_number: number | null;
+  telegram_file_id: string | null;
+  doctor_name: string | null;
+  file_type: 'pdf' | 'document' | 'audio' | 'voice' | 'text';
+  content_text: string | null;
   created_at: string;
 }
 

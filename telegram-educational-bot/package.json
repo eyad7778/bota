@@ -8,7 +8,10 @@
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "typecheck": "tsc --noEmit"
+    "set-webhook": "tsx src/scripts/set-webhook.ts",
+    "delete-webhook": "tsx src/scripts/set-webhook.ts --delete",
+    "typecheck": "tsc --noEmit",
+    "typecheck:vercel": "tsc --noEmit -p tsconfig.vercel.json"
   },
   "keywords": [
     "telegram",
@@ -28,6 +31,7 @@
   "devDependencies": {
     "@types/express": "^4.17.21",
     "@types/node": "^22.13.1",
+    "@vercel/node": "^23.0.1",
     "tsx": "^4.19.2",
     "typescript": "^5.7.3"
   }

@@ -70,7 +70,7 @@ export async function searchLectures(
     });
 
     if (!trimmedQuery) {
-      return enrichedLectures.sort((a, b) => b.lecture_number - a.lecture_number);
+      return enrichedLectures.sort((a, b) => (b.lecture_number ?? 0) - (a.lecture_number ?? 0));
     }
 
     const fuse = new Fuse(enrichedLectures, {
@@ -84,7 +84,7 @@ export async function searchLectures(
     return fuse
       .search(trimmedQuery)
       .map((result) => result.item)
-      .sort((a, b) => b.lecture_number - a.lecture_number);
+      .sort((a, b) => (b.lecture_number ?? 0) - (a.lecture_number ?? 0));
   } catch (error) {
     console.error('Lecture search error:', error);
     return [];
