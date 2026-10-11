@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#f4f7f2">
+  <title>ماجد | رفيق الرحلة</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f4f7f2;
+      --ink: #1d302b;
+      --muted: #697873;
+      --line: #dce5df;
+      --green: #236b52;
+      --green-dark: #174b3a;
+      --lime: #d9eb8d;
+      --blue: #d9e9e7;
+      --white: #fff;
+      font-family: 'IBM Plex Sans Arabic', sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; background: var(--paper); color: var(--ink); }
+    button { font: inherit; }
+    .shell { max-width: 760px; margin: 0 auto; min-height: 100vh; padding: 22px 20px calc(32px + env(safe-area-inset-bottom)); }
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-bottom: 18px; border-bottom: 1px solid var(--line); }
+    .feedback { min-height: 0; margin: 0; color: var(--green); font-size: 12px; }
+    .feedback:not(:empty) { margin-top: 12px; }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-mark { display: grid; place-items: center; width: 44px; aspect-ratio: 1; background: var(--green); color: var(--lime); border-radius: 14px; font-size: 23px; }
+    .brand h1 { margin: 0; font-size: 19px; line-height: 1.3; }
+    .brand p { margin: 3px 0 0; color: var(--muted); font-size: 12px; }
+    .status { display: flex; align-items: center; gap: 7px; color: var(--green); background: #e7f2e8; padding: 7px 11px; border-radius: 99px; font-size: 12px; white-space: nowrap; }
+    .status::before { content: ''; width: 7px; height: 7px; background: #3c9a69; border-radius: 50%; }
+    .welcome { position: relative; overflow: hidden; margin: 22px 0 28px; padding: 24px; border-radius: 8px; background: var(--green-dark); color: white; }
+    .welcome::after { content: 'م'; position: absolute; left: 18px; bottom: -62px; color: rgb(255 255 255 / 6%); font-size: 190px; font-weight: 700; line-height: 1; pointer-events: none; }
+    .welcome-label { margin: 0 0 8px; color: var(--lime); font-size: 12px; font-weight: 600; }
+    .welcome h2 { position: relative; z-index: 1; margin: 0 0 7px; font-size: 23px; line-height: 1.45; }
+    .welcome p:last-child { position: relative; z-index: 1; max-width: 480px; margin: 0; color: #d5e4db; font-size: 13px; line-height: 1.8; }
+    .section-head { display: flex; justify-content: space-between; align-items: end; gap: 12px; margin-bottom: 13px; }
+    .section-head h2 { margin: 0; font-size: 18px; }
+    .section-head p { margin: 4px 0 0; color: var(--muted); font-size: 12px; }
+    .count { color: var(--muted); font-size: 12px; white-space: nowrap; }
+    .course-list { display: grid; gap: 10px; }
+    .course { overflow: hidden; border: 1px solid var(--line); border-radius: 8px; background: var(--white); animation: arrive .35s both; }
+    .course-main { display: flex; align-items: center; justify-content: space-between; gap: 14px; width: 100%; padding: 16px; border: 0; background: transparent; color: inherit; text-align: right; cursor: pointer; }
+    .course-main:hover { background: #f9fbf8; }
+    .course-info { min-width: 0; }
+    .course-info h3 { overflow-wrap: anywhere; margin: 0; font-size: 15px; }
+    .course-info p { margin: 5px 0 0; color: var(--muted); font-size: 12px; }
+    .open-icon { flex: 0 0 34px; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: var(--blue); color: var(--green-dark); font-size: 17px; }
+    .lectures { border-top: 1px solid var(--line); padding: 8px 16px 12px; background: #fbfcfa; }
+    .lecture { display: flex; align-items: start; justify-content: space-between; gap: 12px; padding: 11px 0; border-bottom: 1px solid #e8eee9; }
+    .lecture:last-child { border-bottom: 0; }
+    .lecture-title { margin: 0; font-size: 13px; line-height: 1.6; overflow-wrap: anywhere; }
+    .lecture-meta { margin: 3px 0 0; color: var(--muted); font-size: 11px; }
+    .lecture-action { flex: 0 0 auto; padding: 7px 10px; border: 0; border-radius: 6px; background: var(--green); color: white; font-size: 11px; cursor: pointer; }
+    .lecture-action:disabled { background: #a4b4ac; cursor: default; }
+    .state { padding: 25px 16px; border: 1px dashed #cbd8d0; border-radius: 8px; color: var(--muted); text-align: center; font-size: 13px; line-height: 1.8; }
+    .state.error { color: #9f3b32; }
+    .retry { display: block; margin: 12px auto 0; padding: 8px 14px; border: 1px solid currentColor; border-radius: 6px; background: transparent; color: inherit; cursor: pointer; }
+    .footer { margin-top: 25px; color: #82908a; text-align: center; font-size: 11px; }
+    @keyframes arrive { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
+    @media (min-width: 600px) { .shell { padding-top: 30px; } .welcome { margin-top: 28px; padding: 30px; } .course-list { grid-template-columns: 1fr 1fr; align-items: start; } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; scroll-behavior: auto !important; } }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">م</div>
+        <div><h1>ماجد</h1><p id="student-name">رفيق رحلتك الدراسية</p></div>
+      </div>
+      <span class="status" id="account-status">جارٍ التحقق</span>
+    </header>
+    <p class="feedback" id="app-feedback" role="status" aria-live="polite"></p>
+
+    <section class="welcome" aria-labelledby="welcome-title">
+      <p class="welcome-label">رفيق الرحلة · ٠١</p>
+      <h2 id="welcome-title">أهلاً بك، <span id="first-name">يا بطل</span></h2>
+      <p>موادك ومحاضراتك في مكان واحد. اختر مادة لتستعرض محتواها وتتابع دراستك.</p>
+    </section>
+
+    <section aria-labelledby="courses-title">
+      <div class="section-head">
+        <div><h2 id="courses-title">موادك الدراسية</h2><p>الفصل الدراسي النشط</p></div>
+        <span class="count" id="courses-count"></span>
+      </div>
+      <div class="course-list" id="courses-list" aria-live="polite">
+        <div class="state">جارٍ تحميل موادك...</div>
+      </div>
+    </section>
+    <footer class="footer">ماجد · معك خطوة بخطوة</footer>
+  </main>
+
+  <script>
+    (() => {
+      const telegram = window.Telegram?.WebApp;
+      const container = document.getElementById('courses-list');
+      const coursesCount = document.getElementById('courses-count');
+      const feedback = document.getElementById('app-feedback');
+      const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
+
+      if (telegram) {
+        telegram.ready();
+        telegram.expand();
+        telegram.setHeaderColor?.('#f4f7f2');
+        telegram.setBackgroundColor?.('#f4f7f2');
+        const user = telegram.initDataUnsafe?.user;
+        if (user) {
+          const name = [user.first_name, user.last_name].filter(Boolean).join(' ');
+          document.getElementById('student-name').textContent = name || 'رفيق رحلتك الدراسية';
+          document.getElementById('first-name').textContent = user.first_name || 'يا بطل';
+        }
+      }
+
+      async function request(path, payload) {
+        const response = await fetch(path, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ initData: telegram?.initData || '', ...payload }),
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'تعذّر تحميل البيانات.');
+        return data;
+      }
+
+      function showError(message, retry) {
+        container.innerHTML = `<div class="state error">${escapeHtml(message)}<button class="retry" type="button">إعادة المحاولة</button></div>`;
+        container.querySelector('.retry').addEventListener('click', retry);
+      }
+
+      function renderCourses(courses) {
+        coursesCount.textContent = `${courses.length} ${courses.length === 1 ? 'مادة' : 'مواد'}`;
+        if (!courses.length) {
+          container.innerHTML = '<div class="state">لا توجد مواد مرتبطة بحسابك في الفصل الحالي.</div>';
+          return;
+        }
+
+        container.innerHTML = courses.map((course, index) => `
+          <article class="course" style="animation-delay:${Math.min(index, 8) * 35}ms">
+            <button class="course-main" type="button" aria-expanded="false" data-course="${escapeHtml(course.id)}">
+              <span class="course-info"><h3>${escapeHtml(course.name)}</h3><p>${escapeHtml(course.doctor_name || 'المحاضر غير محدد')}</p></span>
+              <span class="open-icon" aria-hidden="true">⌄</span>
+            </button>
+            <div class="lectures" hidden></div>
+          </article>`).join('');
+
+        container.querySelectorAll('.course-main').forEach((button) => {
+          button.addEventListener('click', () => toggleCourse(button));
+        });
+      }
+
+      async function toggleCourse(button) {
+        const panel = button.parentElement.querySelector('.lectures');
+        const opening = panel.hidden;
+        panel.hidden = !opening;
+        button.setAttribute('aria-expanded', String(opening));
+        if (!opening || panel.dataset.loaded) return;
+        panel.innerHTML = '<div class="state">جارٍ تحميل المحاضرات...</div>';
+        try {
+          const { lectures } = await request('/api/student-lectures', { courseId: button.dataset.course });
+          panel.dataset.loaded = 'true';
+          if (!lectures.length) {
+            panel.innerHTML = '<div class="state">لا توجد محاضرات مضافة لهذه المادة بعد.</div>';
+            return;
+          }
+          panel.innerHTML = lectures.map((lecture) => `
+            <div class="lecture">
+              <div><p class="lecture-title">${escapeHtml(lecture.lecture_number ? `المحاضرة ${lecture.lecture_number}: ` : '')}${escapeHtml(lecture.title)}</p>
+                <p class="lecture-meta">${escapeHtml(lecture.doctor_name || 'محاضرة')}</p></div>
+              <button class="lecture-action" type="button" data-lecture="${escapeHtml(lecture.id)}" ${lecture.has_file || lecture.file_type === 'text' ? '' : 'disabled'}>${lecture.file_type === 'text' ? 'إرسال النص' : 'إرسال للبوت'}</button>
+            </div>`).join('');
+          panel.querySelectorAll('.lecture-action:not(:disabled)').forEach((action) => {
+            action.addEventListener('click', () => openLecture(action.dataset.lecture));
+          });
+        } catch (error) {
+          panel.innerHTML = `<div class="state error">${escapeHtml(error.message)}<button class="retry" type="button">إعادة المحاولة</button></div>`;
+          panel.querySelector('.retry').addEventListener('click', () => {
+            delete panel.dataset.loaded;
+            panel.innerHTML = '';
+            toggleCourse(button);
+          });
+        }
+      }
+
+      async function openLecture(lectureId) {
+        try {
+          const result = await request('/api/open-lecture', { lectureId });
+          feedback.textContent = result.message || 'أُرسلت المحاضرة إلى محادثتك مع ماجد.';
+        } catch (error) {
+          feedback.textContent = error.message;
+          feedback.style.color = '#9f3b32';
+        }
+      }
+
+      async function loadCourses() {
+        container.innerHTML = '<div class="state">جارٍ تحميل موادك...</div>';
+        try {
+          const { courses } = await request('/api/student-courses');
+          document.getElementById('account-status').textContent = 'حساب نشط';
+          renderCourses(courses);
+        } catch (error) {
+          showError(error.message, loadCourses);
+        }
+      }
+
+      loadCourses();
+    })();
+  </script>
+</body>
+</html>

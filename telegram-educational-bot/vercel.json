@@ -8,12 +8,44 @@
     {
       "src": "api/verify-telegram.ts",
       "use": "@vercel/node"
+    },
+    {
+      "src": "api/student-courses.ts",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "api/student-lectures.ts",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "api/open-lecture.ts",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "public/app.html",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
     {
+      "src": "/app/?",
+      "dest": "/public/app.html"
+    },
+    {
       "src": "/api/verify-telegram",
       "dest": "api/verify-telegram.ts"
+    },
+    {
+      "src": "/api/student-courses",
+      "dest": "api/student-courses.ts"
+    },
+    {
+      "src": "/api/student-lectures",
+      "dest": "api/student-lectures.ts"
+    },
+    {
+      "src": "/api/open-lecture",
+      "dest": "api/open-lecture.ts"
     },
     {
       "src": "/(.*)",
