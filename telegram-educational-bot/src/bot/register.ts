@@ -1,4 +1,4 @@
-import { Telegraf, type Context } from 'telegraf';
+import { Markup, Telegraf, type Context } from 'telegraf';
 import { env } from '../config/env';
 import { AdminHandler } from '../handlers/admin.handler';
 import { AuthHandler } from '../handlers/auth.handler';
@@ -17,12 +17,32 @@ bot.start(async (ctx) => {
 
   if (status.active) {
     await SessionService.clearSession(telegramId);
-    await ctx.reply(`أهلاً بك مجدداً يا ${ctx.from.first_name}!`, getMainMenu());
+    const keyboard = [
+      ...(env.appBaseUrl
+        ? [[Markup.button.webApp('🚀 فتح الواجهة الكاملة', `${env.appBaseUrl}/app`)]]
+        : []),
+      [Markup.button.callback('📚 المواد الدراسية', 'view_courses'), Markup.button.callback('👤 حسابي الشخصي', 'my_account')],
+    ];
+    await ctx.reply(
+      `أهلاً بك يا ${ctx.from.first_name || 'يا بطل'}! 🌟\n\nأنا ماجد، رفيقك في الرحلة 🧭\nموجود هنا عشان أساعدك في تنظيم موادك ومتابعة محاضراتك خطوة بخطوة.\n\nجاهز؟ اختر ما نبدأ به اليوم:`,
+      Markup.inlineKeyboard(keyboard)
+    );
     return;
   }
 
   await SessionService.setSession(telegramId, 'AWAITING_CODE');
-  await ctx.reply('مرحباً بك! أرسل رمز التفعيل الخاص بك لتفعيل الحساب.');
+  await ctx.reply(
+    `أهلاً بك يا ${ctx.from.first_name || 'يا بطل'}! أنا ماجد، رفيقك في رحلتك الدراسية 🧭\n\nأرسل رمز التفعيل الخاص بك لنبدأ.`
+  );
+});
+
+bot.action('view_courses', async (ctx) => {
+  await ctx.answerCbQuery();
+  await StudentHandler.handleLecturesMenu(ctx);
+});
+bot.action('my_account', async (ctx) => {
+  await ctx.answerCbQuery();
+  await StudentHandler.handleMyAccount(ctx);
 });
 
 bot.command('admin', (ctx) => AdminHandler.openAdminPanel(ctx));
@@ -134,5 +154,5 @@ bot.on('text', async (ctx) => {
 
 bot.catch((error, ctx) => {
   console.error('Telegram update failed:', error);
-  if (ctx) void ctx.reply('حدثت مشكلة أثناء معالجة طلبك. يرجى المحاولة مرة أخرى.');
+  if (ctx) void ctx.reply('عذراً يا بطل، حصلت مشكلة بسيطة. أنا ماجد، جرّب مرة ثانية بعد لحظة.');
 });

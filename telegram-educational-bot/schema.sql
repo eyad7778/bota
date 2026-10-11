@@ -75,6 +75,23 @@ CREATE TABLE IF NOT EXISTS schedule_events (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+CREATE TABLE IF NOT EXISTS student_notification_settings (
+  student_id BIGINT NOT NULL REFERENCES students(telegram_id) ON DELETE CASCADE,
+  course_id UUID NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
+  notify_lectures BOOLEAN NOT NULL DEFAULT FALSE,
+  PRIMARY KEY (student_id, course_id)
+);
+
+CREATE TABLE IF NOT EXISTS notification_logs (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  student_id BIGINT NOT NULL REFERENCES students(telegram_id) ON DELETE CASCADE,
+  course_id UUID NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
+  content_type TEXT NOT NULL,
+  status TEXT NOT NULL CHECK (status IN ('sent', 'failed')),
+  error_message TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
 CREATE INDEX IF NOT EXISTS idx_students_department_id
   ON students (department_id);
 

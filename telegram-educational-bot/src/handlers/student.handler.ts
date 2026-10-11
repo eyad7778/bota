@@ -2,6 +2,7 @@ import { Markup, type Context } from 'telegraf';
 import { supabase } from '../config/supabase';
 import { getMainMenu } from '../keyboards/menus';
 import { checkStudentStatus } from '../services/auth';
+import { getCourseLectures, getStudentCourses } from '../services/courseService';
 import { searchLectures } from '../services/search';
 
 export class StudentHandler {
@@ -15,24 +16,7 @@ export class StudentHandler {
       return;
     }
 
-    const { data: activeTerm, error: termError } = await supabase
-      .from('terms')
-      .select('id')
-      .eq('is_active', true)
-      .maybeSingle();
-    if (termError) throw termError;
-    if (!activeTerm) {
-      await ctx.reply('لا توجد فصول دراسية نشطة حالياً.', getMainMenu());
-      return;
-    }
-
-    const { data: courses, error } = await supabase
-      .from('courses')
-      .select('id, name')
-      .eq('department_id', status.student.department_id)
-      .eq('term_id', activeTerm.id)
-      .order('name');
-    if (error) throw error;
+    const courses = await getStudentCourses(telegramId);
 
     if (!courses?.length) {
       await ctx.reply('لا توجد مواد دراسية مضافة حالياً.', getMainMenu());
@@ -69,12 +53,7 @@ export class StudentHandler {
       return;
     }
 
-    const { data: lectures, error } = await supabase
-      .from('lectures')
-      .select('id, title, lecture_number')
-      .eq('course_id', courseId)
-      .order('lecture_number', { ascending: true });
-    if (error) throw error;
+    const lectures = await getCourseLectures(courseId);
 
     if (!lectures?.length) {
       await ctx.answerCbQuery('لا توجد محاضرات لهذه المادة حتى الآن.');

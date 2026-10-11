@@ -4,9 +4,17 @@
     {
       "src": "api/index.ts",
       "use": "@vercel/node"
+    },
+    {
+      "src": "api/verify-telegram.ts",
+      "use": "@vercel/node"
     }
   ],
   "routes": [
+    {
+      "src": "/api/verify-telegram",
+      "dest": "api/verify-telegram.ts"
+    },
     {
       "src": "/(.*)",
       "dest": "api/index.ts"

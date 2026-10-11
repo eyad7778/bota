@@ -4,6 +4,7 @@ import { env } from '../config/env';
 import { supabase } from '../config/supabase';
 import { getAdminMenu, getCancelKeyboard } from '../keyboards/menus';
 import { BroadcastService } from '../services/broadcast.service';
+import { broadcastNotification } from '../services/notificationEngine';
 import { SessionService } from '../services/session.service';
 import type { FileType } from '../types/bot';
 
@@ -324,29 +325,18 @@ export class AdminHandler {
       .single();
     if (error) throw error;
 
-    const { data: course, error: courseError } = await supabase
-      .from('courses')
-      .select('name')
-      .eq('id', payload.course_id)
-      .single();
-    if (courseError) throw courseError;
-
     await ctx.answerCbQuery();
-    await ctx.reply('تم حفظ المحتوى. جارٍ إرسال الإشعار...');
-    const result = await BroadcastService.sendToAllActiveStudents(async (studentId) => {
-      const keyboard = Markup.inlineKeyboard([
-        [Markup.button.callback('📄 فتح المحاضرة', `get_lecture:${lecture.id}`)],
-      ]);
-      await ctx.telegram.sendMessage(
-        studentId,
-        `📚 محتوى جديد\nالمادة: ${course.name}\nالعنوان: ${lecture.title}`,
-        keyboard
-      );
-    });
+    await ctx.reply('تم حفظ المحتوى. جارٍ إرسال الإشعار للطلاب المشتركين...');
+    const result = await broadcastNotification(
+      ctx.telegram,
+      lecture.course_id,
+      `📚 محتوى جديد\nالعنوان: ${lecture.title}`,
+      'lecture'
+    );
 
     await SessionService.clearSession(telegramId);
     await ctx.reply(
-      `اكتمل النشر.\nالإجمالي: ${result.total}\nتم الإرسال: ${result.success}\nتعذّر الإرسال: ${result.failed}`,
+      `اكتمل النشر.\nالإجمالي: ${result.total}\nتم الإرسال: ${result.sent}\nتعذّر الإرسال: ${result.failed}`,
       getAdminMenu()
     );
   }
